@@ -32,6 +32,10 @@ class GreetingManager:
             'session_start': datetime.now().isoformat()
         }
         
+        # New feature: Greeting history
+        self.greeting_history = []
+        self.max_history_size = 10
+        
         self.logger.info("Greeting Manager initialized")
     
     def get_standard_greeting(self, name: str = None) -> str:
@@ -50,6 +54,7 @@ class GreetingManager:
         greeting = f"Hello, {name}!"
         
         self._update_stats('standard_greetings')
+        self._add_to_history(greeting, 'standard', name)
         self.logger.debug(f"Generated standard greeting for: {name}")
         
         return greeting
@@ -82,6 +87,7 @@ class GreetingManager:
         
         self._update_stats('multilang_greetings')
         self._update_language_stats(language)
+        self._add_to_history(greeting, f'multilang_{language}', name)
         self.logger.debug(f"Generated {language} greeting for: {name}")
         
         return greeting
@@ -118,6 +124,7 @@ class GreetingManager:
         greeting = template.format(name=name)
         
         self._update_stats('time_based_greetings')
+        self._add_to_history(greeting, f'time_based_{time_key}', name)
         self.logger.debug(f"Generated {time_key} greeting for: {name}")
         
         return greeting
@@ -135,6 +142,7 @@ class GreetingManager:
         processed = f"✨ {message.strip()} ✨"
         
         self._update_stats('custom_messages')
+        self._add_to_history(processed, 'custom_message')
         self.logger.debug(f"Processed custom message: {message[:50]}...")
         
         return processed
@@ -176,3 +184,32 @@ class GreetingManager:
         if language not in self.stats['language_usage']:
             self.stats['language_usage'][language] = 0
         self.stats['language_usage'][language] += 1
+    
+    def _add_to_history(self, greeting: str, greeting_type: str, name: str = None) -> None:
+        """Add greeting to history."""
+        history_entry = {
+            'greeting': greeting,
+            'type': greeting_type,
+            'name': name or 'default',
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        self.greeting_history.insert(0, history_entry)
+        
+        # Maintain max history size
+        if len(self.greeting_history) > self.max_history_size:
+            self.greeting_history = self.greeting_history[:self.max_history_size]
+    
+    def get_greeting_history(self) -> List[Dict[str, str]]:
+        """
+        Get the greeting history.
+        
+        Returns:
+            List of recent greetings with metadata
+        """
+        return self.greeting_history.copy()
+    
+    def clear_history(self) -> None:
+        """Clear the greeting history."""
+        self.greeting_history.clear()
+        self.logger.info("Greeting history cleared")

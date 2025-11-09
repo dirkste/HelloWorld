@@ -197,3 +197,38 @@ class TestGreetingManager:
         assert stats['custom_messages'] == 1
         assert 'session_duration_minutes' in stats
         assert 'session_start' in stats
+    
+    def test_greeting_history(self):
+        """Test greeting history functionality."""
+        self.mock_config.get.return_value = 'World'
+        
+        # Initially empty history
+        history = self.greeting_manager.get_greeting_history()
+        assert len(history) == 0
+        
+        # Add a greeting
+        self.greeting_manager.get_standard_greeting('Alice')
+        history = self.greeting_manager.get_greeting_history()
+        
+        assert len(history) == 1
+        assert history[0]['greeting'] == 'Hello, Alice!'
+        assert history[0]['type'] == 'standard'
+        assert history[0]['name'] == 'Alice'
+        assert 'timestamp' in history[0]
+    
+    def test_clear_history(self):
+        """Test clearing greeting history."""
+        self.mock_config.get.return_value = 'World'
+        
+        # Add some greetings
+        self.greeting_manager.get_standard_greeting('Bob')
+        self.greeting_manager.process_custom_message('Test message')
+        
+        # Verify history has items
+        history = self.greeting_manager.get_greeting_history()
+        assert len(history) == 2
+        
+        # Clear history
+        self.greeting_manager.clear_history()
+        history = self.greeting_manager.get_greeting_history()
+        assert len(history) == 0

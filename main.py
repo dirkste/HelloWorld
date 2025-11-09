@@ -77,34 +77,40 @@ def main():
         print(f"\n🌟 Welcome to {app_config['app']['name']} v{app_config['app']['version']} 🌟\n")
         
         while True:
-            print("\nChoose an option:")
-            print("1. Standard greeting")
-            print("2. Multi-language greeting") 
-            print("3. Time-based greeting")
-            print("4. Custom message")
-            print("5. Show greeting statistics")
-            print("6. Exit")
-            
-            choice = input("\nEnter your choice (1-6): ").strip()
-            logger.debug(f"User selected option: {choice}")
-            
-            if choice == "1":
-                handle_standard_greeting(greeting_manager, logger)
-            elif choice == "2":
-                handle_multilang_greeting(greeting_manager, logger)
-            elif choice == "3":
-                handle_time_greeting(greeting_manager, logger)
-            elif choice == "4":
-                handle_custom_message(greeting_manager, logger)
-            elif choice == "5":
-                handle_statistics(greeting_manager, logger)
-            elif choice == "6":
-                logger.info("Application shutting down by user request")
-                print("\nGoodbye! 👋")
-                break
-            else:
-                logger.warning(f"Invalid menu choice: {choice}")
-                print("❌ Invalid choice. Please try again.")
+        print("\nChoose an option:")
+        print("1. Standard greeting")
+        print("2. Multi-language greeting") 
+        print("3. Time-based greeting")
+        print("4. Custom message")
+        print("5. Show greeting statistics")
+        print("6. Show greeting history")
+        print("7. Clear greeting history")
+        print("8. Exit")
+        
+        choice = input("\nEnter your choice (1-8): ").strip()
+        logger.debug(f"User selected option: {choice}")
+        
+        if choice == "1":
+            handle_standard_greeting(greeting_manager, logger)
+        elif choice == "2":
+            handle_multilang_greeting(greeting_manager, logger)
+        elif choice == "3":
+            handle_time_greeting(greeting_manager, logger)
+        elif choice == "4":
+            handle_custom_message(greeting_manager, logger)
+        elif choice == "5":
+            handle_statistics(greeting_manager, logger)
+        elif choice == "6":
+            handle_greeting_history(greeting_manager, logger)
+        elif choice == "7":
+            handle_clear_history(greeting_manager, logger)
+        elif choice == "8":
+            logger.info("Application shutting down by user request")
+            print("\nGoodbye! 👋")
+            break
+        else:
+            logger.warning(f"Invalid menu choice: {choice}")
+            print("❌ Invalid choice. Please try again.")
                 
     except KeyboardInterrupt:
         logger.info("Application interrupted by user (Ctrl+C)")
@@ -185,6 +191,47 @@ def handle_statistics(greeting_manager: GreetingManager, logger: logging.Logger)
     except Exception as e:
         logger.error(f"Error getting statistics: {str(e)}")
         print("❌ Error retrieving statistics")
+
+
+def handle_greeting_history(greeting_manager: GreetingManager, logger: logging.Logger):
+    """Handle greeting history display."""
+    try:
+        history = greeting_manager.get_greeting_history()
+        logger.debug("Displayed greeting history")
+        
+        if not history:
+            print("\n📝 No greeting history yet.")
+            return
+        
+        print(f"\n📝 Recent Greetings (last {len(history)}):")
+        for i, entry in enumerate(history, 1):
+            timestamp = entry['timestamp'][:19].replace('T', ' ')  # Format datetime
+            print(f"  {i}. [{timestamp}] {entry['type']}: {entry['greeting']}")
+            
+    except Exception as e:
+        logger.error(f"Error getting greeting history: {str(e)}")
+        print("❌ Error retrieving greeting history")
+
+
+def handle_clear_history(greeting_manager: GreetingManager, logger: logging.Logger):
+    """Handle clearing greeting history."""
+    try:
+        history = greeting_manager.get_greeting_history()
+        if not history:
+            print("\n📝 No history to clear.")
+            return
+            
+        confirm = input(f"\nAre you sure you want to clear {len(history)} greeting(s)? (y/N): ").strip().lower()
+        if confirm in ['y', 'yes']:
+            greeting_manager.clear_history()
+            logger.info("User cleared greeting history")
+            print("✅ Greeting history cleared!")
+        else:
+            print("❌ Clear operation cancelled.")
+            
+    except Exception as e:
+        logger.error(f"Error clearing greeting history: {str(e)}")
+        print("❌ Error clearing greeting history")
 
 
 if __name__ == "__main__":
