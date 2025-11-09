@@ -1,0 +1,28 @@
+# Application Settings
+app:
+  name: "Hello World Advanced"
+  version: "1.0.0"
+  debug: false
+
+# Greeting Settings
+greetings:
+  default_name: "World"
+  languages:
+    en: "Hello, {name}!"
+    es: "¡Hola, {name}!"
+    fr: "Bonjour, {name}!"
+    de: "Hallo, {name}!"
+    it: "Ciao, {name}!"
+  
+  time_based:
+    enabled: true
+    morning: "Good morning, {name}!"
+    afternoon: "Good afternoon, {name}!"
+    evening: "Good evening, {name}!"
+    night: "Good night, {name}!"
+
+# Output Settings
+output:
+  color_enabled: true
+  save_to_file: true
+  output_file: "logs/greetings.log"

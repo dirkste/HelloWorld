@@ -1,0 +1,13 @@
+# Hello World Advanced Application Dependencies
+
+# Core dependencies
+PyYAML>=6.0.1
+colorama>=0.4.6
+
+# Development and testing dependencies
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
+
+# Optional: For enhanced logging and formatting
+rich>=13.5.0
